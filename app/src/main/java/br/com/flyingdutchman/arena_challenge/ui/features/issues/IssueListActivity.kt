@@ -2,6 +2,7 @@ package br.com.flyingdutchman.arena_challenge.ui.features.issues
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -24,7 +25,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class IssueListActivity : AppCompatActivity() {
     private val adapter by lazy {
         IssuesAdapter {
-
+            startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse(it.url))
+            )
         }
     }
 

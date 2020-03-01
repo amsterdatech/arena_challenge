@@ -8,6 +8,7 @@ data class Issue(
     var updatedAt: String,
     var userAvatar: String,
     var userName: String,
-    var number: Int
+    var number: Int,
+    var url:String
 )
 

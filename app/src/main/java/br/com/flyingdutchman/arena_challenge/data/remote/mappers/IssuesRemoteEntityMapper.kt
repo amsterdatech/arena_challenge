@@ -15,7 +15,8 @@ open class IssuesRemoteEntityMapper :
                 it.updatedAt,
                 it.user.avatarUrl,
                 it.user.login,
-                it.number
+                it.number,
+                it.htmlUrl
             )
         }
     }

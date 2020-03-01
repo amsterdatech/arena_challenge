@@ -39,7 +39,8 @@ class IssuesViewModel(
                             it.updatedAt,
                             it.userAvatar,
                             it.userLogin,
-                            it.number
+                            it.number,
+                            it.url
                         )
                     }
 
