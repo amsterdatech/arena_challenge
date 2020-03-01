@@ -5,7 +5,7 @@
     android:id="@+id/activity_content_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.features.RepositoryListActivity">
 
 
         <androidx.core.widget.ContentLoadingProgressBar
@@ -15,6 +15,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -22,6 +26,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:itemCount="10"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             tools:listitem="@layout/repo_list_item"
             tools:visibility="visible" />

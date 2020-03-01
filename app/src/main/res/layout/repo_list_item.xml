@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/custom_view_repo_content_root"
+    android:background="?attr/selectableItemBackground"
     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -30,7 +32,6 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:textColor="@android:color/black"
-        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/repo_pr_count"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/repo_name"
@@ -39,7 +40,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/repo_pr_count"
-        style="@style/TextAppearance.AppCompat.Body1"
+        style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -56,7 +57,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/repo_stars_count"
-        style="@style/TextAppearance.AppCompat.Body1"
+        style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -72,7 +73,7 @@
         app:layout_constraintTop_toTopOf="@+id/repo_pr_count"
         tools:text="98" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/repo_user_avatar"
         android:layout_width="52dp"
         android:layout_height="52dp"
@@ -80,6 +81,8 @@
         android:layout_marginTop="16dp"
         android:scaleType="centerCrop"
         android:visibility="visible"
+        app:civ_border_width="1dp"
+        app:civ_border_color="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/repo_name"
         tools:src="@tools:sample/avatars"
