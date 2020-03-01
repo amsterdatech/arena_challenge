@@ -57,7 +57,7 @@ class IssuesAdapter(private val action: (Issue) -> Unit? = {}) :
             if (item.description.isNotEmpty()) {
                 itemView.issue_description.text = item.description
             } else {
-                itemView.issue_description.gone()
+                itemView.issue_description.hide()
             }
 
             itemView.issue_owner_name.text = item.userName

@@ -53,10 +53,6 @@ class IssueListActivity : AppCompatActivity() {
 
         repository = intent?.extras?.getParcelable<Repository>(REPOSITORY)
 
-
-//        lifecycle.addObserver(viewModel)
-
-
         setupObservers()
 
         viewModel.loadIssues(
