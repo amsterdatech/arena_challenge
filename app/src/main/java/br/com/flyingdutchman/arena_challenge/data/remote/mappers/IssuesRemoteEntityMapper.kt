@@ -10,9 +10,11 @@ open class IssuesRemoteEntityMapper :
             IssueData(
                 it.id,
                 it.title,
+                it.body,
                 it.state,
                 it.updatedAt,
                 it.user.avatarUrl,
+                it.user.login,
                 it.number
             )
         }

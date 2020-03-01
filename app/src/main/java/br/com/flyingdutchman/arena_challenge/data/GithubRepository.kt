@@ -7,6 +7,8 @@ import br.com.flyingdutchman.arena_challenge.data.remote.GithubApi
 import br.com.flyingdutchman.arena_challenge.data.remote.mappers.IssueDetailRemoteEntityMapper
 import br.com.flyingdutchman.arena_challenge.data.remote.mappers.IssuesRemoteEntityMapper
 import br.com.flyingdutchman.arena_challenge.data.remote.mappers.RepoRemoteEntityMapper
+import br.com.flyingdutchman.arena_challenge.data.remote.model.Issue
+import br.com.flyingdutchman.arena_challenge.data.remote.model.IssueDetail
 import br.com.flyingdutchman.arena_challenge.extensions.parseIsoDateFormat
 import io.reactivex.Scheduler
 import io.reactivex.Single
@@ -14,7 +16,6 @@ import io.reactivex.Single
 class GithubRepository(
     private val api: GithubApi,
     private val issuesMapper: IssuesRemoteEntityMapper,
-    private val issuesDetailMapper: IssueDetailRemoteEntityMapper,
     private val repoMapper: RepoRemoteEntityMapper,
     private val ioScheduler: Scheduler
 ) {
@@ -22,25 +23,13 @@ class GithubRepository(
     fun getIssues(repoOwner: String, repoName: String): Single<List<IssueData>> {
         return api
             .getIssues(repoOwner, repoName)
+
             .subscribeOn(ioScheduler)
             .map { apiResponse ->
                 issuesMapper
                     .mapFromRemote(apiResponse)
                     .sortedByDescending { it.updatedAt.parseIsoDateFormat()?.time }
             }
-    }
-
-    fun getIssueDetail(
-        repoOwner: String,
-        repoName: String,
-        issueNumber: Int
-    ): Single<IssueDetailData> {
-        return api.getIssueDetail(repoOwner, repoName, issueNumber.toString())
-            .subscribeOn(ioScheduler)
-            .map {
-                issuesDetailMapper.mapFromRemote(it)
-            }
-
     }
 
     fun searchRepos(): Single<List<RepoData>> {

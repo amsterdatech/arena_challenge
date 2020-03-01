@@ -12,6 +12,7 @@ import br.com.flyingdutchman.arena_challenge.data.remote.GithubApi
 import br.com.flyingdutchman.arena_challenge.data.remote.mappers.IssueDetailRemoteEntityMapper
 import br.com.flyingdutchman.arena_challenge.data.remote.mappers.IssuesRemoteEntityMapper
 import br.com.flyingdutchman.arena_challenge.data.remote.mappers.RepoRemoteEntityMapper
+import br.com.flyingdutchman.arena_challenge.presentation.IssuesViewModel
 import br.com.flyingdutchman.arena_challenge.presentation.RepositoyViewModel
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
@@ -37,8 +38,7 @@ import java.util.concurrent.TimeUnit
 
 val viewModelModule = module {
 
-    //    viewModel { IssuesViewModel(get(), get(), get(named(MAIN_SCHEDULER))) }
-//    viewModel { IssueDetailViewModel(get(), get(), get(named(MAIN_SCHEDULER))) }
+    viewModel { IssuesViewModel(get(), get(), get(named(MAIN_SCHEDULER))) }
     viewModel { RepositoyViewModel(get(), get(named(MAIN_SCHEDULER))) }
 }
 
@@ -145,9 +145,6 @@ val repositoryModule = module {
         return IssuesRemoteEntityMapper()
     }
 
-    fun provideIssueDetailRemoteMapper(): IssueDetailRemoteEntityMapper {
-        return IssueDetailRemoteEntityMapper()
-    }
 
     fun provideRepoRemoteMapper(): RepoRemoteEntityMapper {
         return RepoRemoteEntityMapper()
@@ -157,23 +154,20 @@ val repositoryModule = module {
     fun provideGithubRepository(
         api: GithubApi,
         issueRemoteMapper: IssuesRemoteEntityMapper,
-        issueDetailRemoteEntityMapper: IssueDetailRemoteEntityMapper,
         repoRemoteEntityMapper: RepoRemoteEntityMapper,
         ioScheduler: Scheduler
     ): GithubRepository {
         return GithubRepository(
             api,
             issueRemoteMapper,
-            issueDetailRemoteEntityMapper,
             repoRemoteEntityMapper,
             ioScheduler
         )
     }
 
     single { provideIssueRemoteMapper() }
-    single { provideIssueDetailRemoteMapper() }
     single { provideRepoRemoteMapper() }
-    single { provideGithubRepository(get(), get(), get(), get(), get(named(IO_SCHEDULER))) }
+    single { provideGithubRepository(get(), get(), get(), get(named(IO_SCHEDULER))) }
     factory { CompositeDisposable() }
     single(named(IO_SCHEDULER)) { Schedulers.io() }
     single(named(MAIN_SCHEDULER)) { AndroidSchedulers.mainThread() }

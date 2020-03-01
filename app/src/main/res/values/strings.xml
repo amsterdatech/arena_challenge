@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Arena Challenge</string>
 
+    <string name="generic_error">Error ocurred</string>
+
+
     <string name="text_elapsed_now">Now</string>
     <string name="text_elapsed_today">Today</string>
     <string name="text_elapsed_minutes">%dm</string>

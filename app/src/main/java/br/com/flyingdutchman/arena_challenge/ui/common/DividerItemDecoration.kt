@@ -1,4 +1,4 @@
-package br.com.flyingdutchman.arena_challenge.ui
+package br.com.flyingdutchman.arena_challenge.ui.common
 
 import android.R
 import android.content.Context

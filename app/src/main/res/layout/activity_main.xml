@@ -5,7 +5,7 @@
     android:id="@+id/activity_content_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.features.RepositoryListActivity">
+    tools:context=".ui.features.repositories.RepositoryListActivity">
 
 
         <androidx.core.widget.ContentLoadingProgressBar

@@ -1,4 +1,4 @@
-package br.com.flyingdutchman.arena_challenge.ui
+package br.com.flyingdutchman.arena_challenge.ui.features.repositories
 
 import android.view.LayoutInflater
 import android.view.View

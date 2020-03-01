@@ -1,4 +1,4 @@
-package br.com.flyingdutchman.arena_challenge.ui.features
+package br.com.flyingdutchman.arena_challenge.ui.features.repositories
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,7 +11,7 @@ import br.com.flyingdutchman.arena_challenge.extensions.show
 import br.com.flyingdutchman.arena_challenge.extensions.snackBar
 import br.com.flyingdutchman.arena_challenge.presentation.RepositoyViewModel
 import br.com.flyingdutchman.arena_challenge.presentation.ViewState
-import br.com.flyingdutchman.arena_challenge.ui.RepositoryAdapter
+import br.com.flyingdutchman.arena_challenge.ui.features.issues.IssueListActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -19,7 +19,7 @@ class RepositoryListActivity : AppCompatActivity() {
 
     private val adapter by lazy {
         RepositoryAdapter {
-
+            startActivity(IssueListActivity.createIntent(this, it))
         }
     }
 
