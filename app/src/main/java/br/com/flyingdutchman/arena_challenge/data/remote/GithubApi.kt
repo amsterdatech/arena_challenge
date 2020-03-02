@@ -26,7 +26,7 @@ interface GithubApi {
     fun searchRepos(
         @Query("q") q: String = "language:Java",
         @Query("page") page: Int = 1,
-        @Query("per_page") perPage: Int = 20,
+        @Query("per_page") perPage: Int = 10,
         @Query("sort") sort: String = "stars"
     ): Single<RepositoryResult>
 }

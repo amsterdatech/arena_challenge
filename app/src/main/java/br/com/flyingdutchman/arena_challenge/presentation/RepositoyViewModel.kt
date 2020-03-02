@@ -2,13 +2,16 @@ package br.com.flyingdutchman.arena_challenge.presentation
 
 import androidx.lifecycle.*
 import br.com.flyingdutchman.arena_challenge.data.GithubRepository
+import br.com.flyingdutchman.arena_challenge.presentation.livedata.SingleLiveEvent
 import br.com.flyingdutchman.arena_challenge.ui.features.repositories.Repository
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 
-class RepositoyViewModel(private val repository: GithubRepository,
-                         private var mainScheduler: Scheduler) :
+class RepositoyViewModel(
+    private val repository: GithubRepository,
+    private var mainScheduler: Scheduler
+) :
     ViewModel(), LifecycleObserver {
 
     val viewState: MutableLiveData<ViewState<List<Repository>>> by lazy {
@@ -19,8 +22,7 @@ class RepositoyViewModel(private val repository: GithubRepository,
         CompositeDisposable()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun loadRepositories() {
+    fun loadRepositories(page: Int = 1) {
         if (viewState.value == null) {
             viewState.postValue(
                 ViewState(
@@ -30,8 +32,8 @@ class RepositoyViewModel(private val repository: GithubRepository,
         }
 
         repository
-            .searchRepos()
-            .observeOn(AndroidSchedulers.mainThread())
+            .searchRepos(page)
+            .observeOn(mainScheduler)
             .subscribe(
                 { result ->
                     viewState.postValue(
@@ -54,7 +56,7 @@ class RepositoyViewModel(private val repository: GithubRepository,
                     viewState.postValue(
                         ViewState(
                             ViewState.Status.ERROR,
-                            null
+                            error = it
                         )
                     )
                 })

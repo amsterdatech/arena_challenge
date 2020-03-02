@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.repo_list_item.view.*
 
 class RepositoryAdapter(private val action: (Repository) -> Unit? = {}) :
     RecyclerView.Adapter<RepositoryAdapter.ViewHolder>() {
-    private var items: MutableList<Repository> = mutableListOf()
+    var items: MutableList<Repository> = mutableListOf()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -37,14 +37,17 @@ class RepositoryAdapter(private val action: (Repository) -> Unit? = {}) :
 
 
     fun updateItems(news: List<Repository>) {
-        val result = DiffUtil.calculateDiff(
-            RepoDiffUtils(
-                news,
-                items
-            )
+
+
+        val callback = RepoDiffUtils(
+            news,
+            items
         )
-        items.clear()
+
+        val result = DiffUtil.calculateDiff(callback)
+
         items.addAll(news)
+
         result.dispatchUpdatesTo(this)
     }
 
@@ -81,8 +84,8 @@ class RepositoryAdapter(private val action: (Repository) -> Unit? = {}) :
 
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val freshItem = freshNews[newItemPosition]
-            val oldItem = oldNews[oldItemPosition]
+            val freshItem = freshNews[newItemPosition].repoName
+            val oldItem = oldNews[oldItemPosition].repoName
             return freshItem == oldItem
         }
     }

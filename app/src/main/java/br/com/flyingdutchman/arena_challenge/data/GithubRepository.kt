@@ -32,8 +32,8 @@ class GithubRepository(
             }
     }
 
-    fun searchRepos(): Single<List<RepoData>> {
-        return api.searchRepos()
+    fun searchRepos(page: Int = 1): Single<List<RepoData>> {
+        return api.searchRepos(page = page)
             .subscribeOn(ioScheduler)
             .map { result ->
                 repoMapper.mapFromRemote(result.items)
