@@ -88,7 +88,7 @@ class RepositoryListActivity : AppCompatActivity(),
                 ViewState.Status.SUCCESS -> {
                     activity_results_loading.hide()
                     adapter.updateItems(state.data ?: emptyList())
-                    this.nextPage++
+                    nextPage++
                 }
             }
         })
