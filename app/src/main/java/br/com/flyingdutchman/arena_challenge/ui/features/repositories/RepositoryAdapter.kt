@@ -33,16 +33,27 @@ class RepositoryAdapter(private val action: (Repository) -> Unit? = {}) :
         }
     }
 
+    override fun getItemId(position: Int): Long = items[position].id.toLong()
+
     override fun getItemCount(): Int = items.size
 
 
-    fun updateItems(news: List<Repository>) {
-        items.addAll(news)
+    fun updateItems(list: List<Repository>) {
+//        val callback = RepoDiffUtils(
+//            news,
+//            items
+//        )
+//        val result = DiffUtil.calculateDiff(callback)
+//        items.addAll(news)
+//        result.dispatchUpdatesTo(this)
+
+        items.addAll(list)
         notifyDataSetChanged()
     }
 
-    fun clear(){
+    fun clear() {
         items.clear()
+        notifyDataSetChanged()
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -78,8 +89,8 @@ class RepositoryAdapter(private val action: (Repository) -> Unit? = {}) :
 
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val freshItem = freshNews[newItemPosition].repoName
-            val oldItem = oldNews[oldItemPosition].repoName
+            val freshItem = freshNews[newItemPosition]
+            val oldItem = oldNews[oldItemPosition]
             return freshItem == oldItem
         }
     }

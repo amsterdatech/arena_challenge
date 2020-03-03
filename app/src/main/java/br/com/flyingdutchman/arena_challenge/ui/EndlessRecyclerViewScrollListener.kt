@@ -35,7 +35,7 @@ class EndlessRecyclerViewScrollListener : RecyclerView.OnScrollListener {
                 && firstVisibleItemPosition >= 0
                 && totalItemCount >= PER_PAGE
             ) {
-                paginationCallback?.loadMore(paginationCallback?.nextPage() ?: PAGE_START)
+                paginationCallback?.loadMore()
             }
         }
     }
@@ -47,9 +47,7 @@ class EndlessRecyclerViewScrollListener : RecyclerView.OnScrollListener {
     }
 
     interface PaginationCallback {
-        fun loadMore(page: Int)
-
-        fun nextPage(): Int
+        fun loadMore()
 
         fun hasNextPage(): Boolean
 

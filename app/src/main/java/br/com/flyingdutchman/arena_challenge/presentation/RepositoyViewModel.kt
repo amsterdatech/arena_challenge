@@ -2,8 +2,11 @@ package br.com.flyingdutchman.arena_challenge.presentation
 
 import androidx.lifecycle.*
 import br.com.flyingdutchman.arena_challenge.data.GithubRepository
+import br.com.flyingdutchman.arena_challenge.data.model.RepoData
+import br.com.flyingdutchman.arena_challenge.presentation.livedata.SingleLiveEvent
 import br.com.flyingdutchman.arena_challenge.ui.features.repositories.Repository
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 
 class RepositoyViewModel(
@@ -11,10 +14,9 @@ class RepositoyViewModel(
     private var mainScheduler: Scheduler
 ) :
     ViewModel(), LifecycleObserver {
-
-    val viewState: MutableLiveData<ViewState<List<Repository>>> by lazy {
-        MutableLiveData<ViewState<List<Repository>>>()
-    }
+    val successState = MutableLiveData<List<Repository>>()
+    val errorState = MutableLiveData<SingleLiveEvent<Throwable>>()
+    val loadingState = MutableLiveData<Boolean>()
 
 
     private val compositeDisposable: CompositeDisposable by lazy {
@@ -22,40 +24,17 @@ class RepositoyViewModel(
     }
 
     fun loadRepositories(page: Int = 1) {
-        if (viewState.value == null) {
-            viewState.value =
-                ViewState(
-                    status = ViewState.Status.LOADING
-                )
-        }
+        loadingState.value = true
 
         repository
             .searchRepos(page)
             .observeOn(mainScheduler)
             .subscribe(
                 { result ->
-                    viewState.value =
-                        ViewState(
-                            status = ViewState.Status.SUCCESS,
-                            data = result.map {
-                                Repository(
-                                    it.id,
-                                    it.repoName,
-                                    it.repoDescription,
-                                    it.ownerName,
-                                    it.ownerAvatar,
-                                    it.forksCount,
-                                    it.starsCount
-                                )
-                            })
-
+                    successState.value = mapResultToViewModel(result)
                 },
                 {
-                    viewState.value =
-                        ViewState(
-                            ViewState.Status.ERROR,
-                            error = it
-                        )
+                    errorState.value = SingleLiveEvent(it)
 
                 })
             .apply {
@@ -67,5 +46,19 @@ class RepositoyViewModel(
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.clear()
+    }
+
+    private fun mapResultToViewModel(result: List<RepoData>): List<Repository> {
+        return result.map {
+            Repository(
+                it.id,
+                it.repoName,
+                it.repoDescription,
+                it.ownerName,
+                it.ownerAvatar,
+                it.forksCount,
+                it.starsCount
+            )
+        }
     }
 }

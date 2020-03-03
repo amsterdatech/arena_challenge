@@ -10,6 +10,7 @@ import br.com.flyingdutchman.arena_challenge.*
 import br.com.flyingdutchman.arena_challenge.extensions.snackBar
 import br.com.flyingdutchman.arena_challenge.presentation.RepositoyViewModel
 import br.com.flyingdutchman.arena_challenge.presentation.ViewState
+import br.com.flyingdutchman.arena_challenge.presentation.livedata.SingleLiveEvent
 import br.com.flyingdutchman.arena_challenge.ui.EndlessRecyclerViewScrollListener
 import br.com.flyingdutchman.arena_challenge.ui.EndlessRecyclerViewScrollListener.Companion.PAGE_START
 import br.com.flyingdutchman.arena_challenge.ui.EndlessRecyclerViewScrollListener.Companion.PER_PAGE
@@ -20,7 +21,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class RepositoryListActivity : AppCompatActivity(),
     EndlessRecyclerViewScrollListener.PaginationCallback {
 
-    private var hasNextPage = true
     private var isLoading = false
     private var currentPage = PAGE_START
     private var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener? = null
@@ -28,6 +28,8 @@ class RepositoryListActivity : AppCompatActivity(),
     private val adapter by lazy {
         RepositoryAdapter {
             startActivity(IssueListActivity.createIntent(this, it))
+        }.apply {
+            setHasStableIds(true)
         }
     }
 
@@ -42,7 +44,7 @@ class RepositoryListActivity : AppCompatActivity(),
     private val viewModel: RepositoyViewModel by viewModel()
 
     companion object {
-        const val REPO_RESULT = "REPO_RESULT"
+        const val REPO_CURRENT_ITEMS = "REPO_CURRENT_ITEMS"
     }
 
 
@@ -51,24 +53,30 @@ class RepositoryListActivity : AppCompatActivity(),
         setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_main)
 
+        setupRecyclerView()
+        setupObservers()
+
         savedInstanceState?.let {
-            if (it.containsKey(REPO_RESULT)) {
+            if (it.containsKey(REPO_CURRENT_ITEMS)) {
+                val savedState: List<Repository> =
+                    savedInstanceState.getParcelableArrayList(REPO_CURRENT_ITEMS)
+
+                currentPage = PAGE_START + 1
                 adapter.clear()
-                adapter.updateItems(savedInstanceState.getParcelableArrayList(REPO_RESULT))
+                viewModel.successState.value = savedState
             }
 
         } ?: run {
-            viewModel.loadRepositories(currentPage)
+            if (viewModel.successState.value == null) {
+                currentPage = PAGE_START
+                viewModel.loadRepositories(currentPage)
+            }
         }
-
-
-        setupObservers()
-        setupRecyclerView()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         if (adapter.items.isNotEmpty()) outState.putParcelableArrayList(
-            REPO_RESULT,
+            REPO_CURRENT_ITEMS,
             adapter.items.slice(0 until PER_PAGE) as ArrayList
         )
 
@@ -78,56 +86,55 @@ class RepositoryListActivity : AppCompatActivity(),
     override fun onDestroy() {
         super.onDestroy()
         endlessRecyclerViewScrollListener?.clear()
-        adapter.clear()
     }
 
     private fun setupObservers() {
-        viewModel.viewState.observe(this, Observer { state ->
-            when (state.status) {
-                ViewState.Status.LOADING -> {
-                    isLoading = true
+        viewModel.loadingState.observe(this, Observer {
+            handleLoading()
+        })
 
-                    handleLoading()
-                }
-
-                ViewState.Status.ERROR -> {
-                    isLoading = false
-                    handleError(state)
-                }
-
-                ViewState.Status.SUCCESS -> {
-                    isLoading = false
-                    activity_results_loading.hide()
-                    //Add EmptyStateView
-                    adapter.updateItems(state.data ?: emptyList())
-                }
+        viewModel.errorState.observe(this, Observer {
+            isLoading = false
+            handleError(it)
+            if (currentPage > 2) {
+                currentPage -= 1
             }
+        })
+
+        viewModel.successState.observe(this, Observer {
+            isLoading = false
+            activity_results_loading.hide()
+            adapter.updateItems(it)
         })
     }
 
     private fun handleLoading() {
-        activity_results_loading.show()
+        if (currentPage == PAGE_START) activity_results_loading.show()
     }
 
-    private fun handleError(state: ViewState<List<Repository>>) {
-        activity_results_loading.hide()
-        activity_content_root
-            .snackBar(
-                snackBarText = "Error ${(state.error as Throwable).message}",
-                listener = {
-                    viewModel.loadRepositories()
-                }
-            )
-            .show()
+    private fun handleError(state: SingleLiveEvent<Throwable>) {
+        state.getContentIfNotHandled()?.let {
+            activity_results_loading.hide()
+            activity_content_root
+                .snackBar(
+                    snackBarText = "Error ${it.message}",
+                    listener = {
+                        viewModel.loadRepositories(currentPage)
+                    }
+                )
+                .show()
+        }
     }
 
     private fun setupRecyclerView() {
         with(activity_results_recycler_view) {
             setHasFixedSize(true)
 
+
             layoutManager = verticalLayoutManager
 
             adapter = this@RepositoryListActivity.adapter
+
 
             addItemDecoration(divider())
 
@@ -154,13 +161,14 @@ class RepositoryListActivity : AppCompatActivity(),
         return dividerDecor
     }
 
-    override fun nextPage(): Int = currentPage++
 
-    override fun hasNextPage(): Boolean = hasNextPage
+    override fun hasNextPage(): Boolean = currentPage < 10
 
     override fun isLoading(): Boolean = isLoading
 
-    override fun loadMore(page: Int) {
-        viewModel.loadRepositories(page)
+    override fun loadMore() {
+        isLoading = true
+        currentPage += 1
+        viewModel.loadRepositories(currentPage)
     }
 }
