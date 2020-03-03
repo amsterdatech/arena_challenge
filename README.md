@@ -44,3 +44,16 @@ A foto do mockup é meramente ilustrativa.
 ### **Processo de submissão** ###
 
 O candidato deverá implementar a solução e enviar o link do repositório GitHub com a solução.
+
+### **Adicionando personal access token** ###
+
+Quando o token de acesso é commitado e pushado, o Github por segurança remove o token imediatamente , sendo a boa pratica usar o mesmo como variavel de ambiente e não hardcoded no projeto
+
+* [Processo para geração do personal token](https://help.github.com/en/enterprise/2.17/user/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line)
+
+* [Issue com suposto relatorio do comportamento do Github](https://stackoverflow.com/questions/53579650/github-api-personal-access-token-removes-itself
+)
+* Substituir  a palavra "personal-token"  dentro do arquivo app/build.gradle na seção pelo token gerado:
+
+<p><img src="./replace_token.png" width="500" />
+</p>

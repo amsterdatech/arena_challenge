@@ -17,6 +17,7 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         buildConfigField 'String', 'REST_SERVER', '"https://api.github.com/"'
+        buildConfigField 'String', 'GITHUB_TOKEN', '"personal-token"'
     }
     buildTypes {
         release {
