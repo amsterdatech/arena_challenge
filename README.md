@@ -58,6 +58,17 @@ Quando o token de acesso é commitado e pushado, o Github por segurança remove 
 <p><img src="./replace_token.png" width="500" />
 </p>
 
+### **Screenshots** ###
+<p><img src="./screenshots/splash.png" width="200" />
+</p>
+<p><img src="./screenshots/repo_list.png" width="200" />
+</p>
+<p><img src="./screenshots/repo_issue_list.png" width="200" />
+</p>
+<p><img src="./screenshots/issue_browser.png" width="200" />
+</p>
+
+
 ### **Melhorias** ###
 
 * Implementação de View EmptyState
