@@ -97,7 +97,7 @@ val netModule = module {
         val newRequest = requestOriginal.newBuilder()
         newRequest.header(
             HEADER_KEY_AUTHORIZATION,
-            "token 839444194999791a1763ce29748a1b24d28cefb8"
+            "bearer cd3208bdd4cc93b990d459fb258e2ff2a97c3ef3"
         )
             .url(requestOriginal.url().newBuilder().build())
 

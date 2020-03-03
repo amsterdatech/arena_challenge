@@ -70,10 +70,13 @@ class RepositoryListActivity : AppCompatActivity(),
             when (state.status) {
                 ViewState.Status.LOADING -> {
                     activity_results_loading.show()
-//                    activity_results_recycler_view.hide()
+                    isLoading = true
                 }
 
                 ViewState.Status.ERROR -> {
+                    if (isLoading) {
+                        isLoading = false
+                    }
                     activity_results_loading.hide()
                     activity_content_root
                         .snackBar(
@@ -86,9 +89,13 @@ class RepositoryListActivity : AppCompatActivity(),
                 }
 
                 ViewState.Status.SUCCESS -> {
+                    if (isLoading) {
+                        isLoading = false
+                    }
                     activity_results_loading.hide()
                     adapter.updateItems(state.data ?: emptyList())
                     nextPage++
+
                 }
             }
         })

@@ -17,7 +17,7 @@ class App : Application() {
 
         const val IO_SCHEDULER = "IO_SCHEDULER"
         const val MAIN_SCHEDULER = "MAIN_SCHEDULER"
-        const val HEADER_KEY_AUTHORIZATION = "Authorization"
+        const val HEADER_KEY_AUTHORIZATION = "authorization"
         const val NAMED_INTERCEPTOR_HEADER = "NAMED_INTERCEPTOR_HEADER"
     }
 
