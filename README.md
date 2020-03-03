@@ -57,3 +57,10 @@ Quando o token de acesso é commitado e pushado, o Github por segurança remove 
 
 <p><img src="./replace_token.png" width="500" />
 </p>
+
+### **Melhorias** ###
+
+* Implementação de View EmptyState
+* Implementação de Footer com Loading no RecyclerView 
+* Implementação de Footer com Error View e botão retry no RecyclerView
+* Utilizar Jetpack Paging Library
