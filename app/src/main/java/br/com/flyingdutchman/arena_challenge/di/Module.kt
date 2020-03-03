@@ -97,7 +97,7 @@ val netModule = module {
         val newRequest = requestOriginal.newBuilder()
         newRequest.header(
             HEADER_KEY_AUTHORIZATION,
-            "token ${BuildConfig.GITHUB_TOKEN}"
+            "token 839444194999791a1763ce29748a1b24d28cefb8"
         )
             .url(requestOriginal.url().newBuilder().build())
 
