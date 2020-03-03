@@ -42,7 +42,6 @@ class RepositoryListActivity : AppCompatActivity(),
 
     companion object {
         const val REPO_RESULT = "REPO_RESULT"
-        const val REPO_PAGE = "REPO_PAGE"
     }
 
 
@@ -55,12 +54,11 @@ class RepositoryListActivity : AppCompatActivity(),
             if (it.containsKey(REPO_RESULT)) {
                 adapter.clear()
                 adapter.updateItems(savedInstanceState.getParcelableArrayList(REPO_RESULT))
+                viewModel.nextPage = PAGE_START
             }
 
-            if (it.containsKey(REPO_PAGE)) {
-                viewModel.nextPage = savedInstanceState.getInt(REPO_PAGE)
-            }
         } ?: run {
+            viewModel.nextPage = PAGE_START
             lifecycle.addObserver(viewModel)
         }
 
@@ -75,8 +73,6 @@ class RepositoryListActivity : AppCompatActivity(),
             adapter.items.slice(0 until PER_PAGE) as ArrayList
         )
 
-        outState.putInt(REPO_PAGE, viewModel.nextPage)
-
         super.onSaveInstanceState(outState)
     }
 
@@ -89,51 +85,51 @@ class RepositoryListActivity : AppCompatActivity(),
         viewModel.viewState.observe(this, Observer { state ->
             when (state.status) {
                 ViewState.Status.LOADING -> {
-                    activity_results_loading.show()
                     isLoading = true
+
+                    handleLoading()
                 }
 
                 ViewState.Status.ERROR -> {
-                    activity_results_loading.hide()
-                    activity_content_root
-                        .snackBar(
-                            snackBarText = "Error ${(state.error as Throwable).message}",
-                            listener = {
-                                viewModel.loadRepositories()
-                            }
-                        )
-                        .show()
-
                     isLoading = false
+                    handleError(state)
                 }
 
                 ViewState.Status.SUCCESS -> {
-                    activity_results_loading.hide()
-                    adapter.updateItems(state.data ?: emptyList())
-                    viewModel.nextPage++
                     isLoading = false
+                    activity_results_loading.hide()
+                    //Add EmptyStateView
+                    adapter.updateItems(state.data ?: emptyList())
                 }
             }
         })
     }
 
-    private fun setupRecyclerView() {
-        val dividerDecor =
-            DividerItemDecoration(
-                this,
-                DividerItemDecoration.VERTICAL
+    private fun handleLoading() {
+        activity_results_loading.show()
+    }
+
+    private fun handleError(state: ViewState<List<Repository>>) {
+        activity_results_loading.hide()
+        activity_content_root
+            .snackBar(
+                snackBarText = "Error ${(state.error as Throwable).message}",
+                listener = {
+                    viewModel.loadRepositories()
+                }
             )
-        dividerDecor.setDrawable(
-            ContextCompat.getDrawable(this, R.drawable.divider)
-                ?: getDrawable(R.drawable.divider)
-        )
+            .show()
+    }
+
+    private fun setupRecyclerView() {
         with(activity_results_recycler_view) {
             setHasFixedSize(true)
 
             layoutManager = verticalLayoutManager
 
-            addItemDecoration(dividerDecor)
             adapter = this@RepositoryListActivity.adapter
+
+            addItemDecoration(divider())
 
             endlessRecyclerViewScrollListener = EndlessRecyclerViewScrollListener(
                 verticalLayoutManager,
@@ -145,6 +141,19 @@ class RepositoryListActivity : AppCompatActivity(),
 
     }
 
+    private fun divider(): DividerItemDecoration {
+        val dividerDecor =
+            DividerItemDecoration(
+                this,
+                DividerItemDecoration.VERTICAL
+            )
+        dividerDecor.setDrawable(
+            ContextCompat.getDrawable(this, R.drawable.divider)
+                ?: getDrawable(R.drawable.divider)
+        )
+        return dividerDecor
+    }
+
     override fun nextPage(): Int = viewModel.nextPage
 
     override fun hasNextPage(): Boolean = hasNextPage
@@ -152,6 +161,7 @@ class RepositoryListActivity : AppCompatActivity(),
     override fun isLoading(): Boolean = isLoading
 
     override fun loadMore(page: Int) {
+        viewModel.nextPage++
         viewModel.loadRepositories()
     }
 }

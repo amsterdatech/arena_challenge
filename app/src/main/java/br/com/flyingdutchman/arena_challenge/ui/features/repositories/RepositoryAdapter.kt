@@ -37,19 +37,8 @@ class RepositoryAdapter(private val action: (Repository) -> Unit? = {}) :
 
 
     fun updateItems(news: List<Repository>) {
-
-
-//        val callback = RepoDiffUtils(
-//            news,
-//            items
-//        )
-
-//        val result = DiffUtil.calculateDiff(callback)
-
         items.addAll(news)
         notifyDataSetChanged()
-
-//        result.dispatchUpdatesTo(this)
     }
 
     fun clear(){
