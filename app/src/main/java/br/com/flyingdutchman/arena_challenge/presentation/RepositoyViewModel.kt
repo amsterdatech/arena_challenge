@@ -16,14 +16,12 @@ class RepositoyViewModel(
         MutableLiveData<ViewState<List<Repository>>>()
     }
 
-    var nextPage = 1
 
     private val compositeDisposable: CompositeDisposable by lazy {
         CompositeDisposable()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun loadRepositories() {
+    fun loadRepositories(page: Int = 1) {
         if (viewState.value == null) {
             viewState.value =
                 ViewState(
@@ -32,7 +30,7 @@ class RepositoyViewModel(
         }
 
         repository
-            .searchRepos(nextPage)
+            .searchRepos(page)
             .observeOn(mainScheduler)
             .subscribe(
                 { result ->

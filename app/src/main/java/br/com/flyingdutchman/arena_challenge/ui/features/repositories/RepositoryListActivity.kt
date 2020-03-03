@@ -22,6 +22,7 @@ class RepositoryListActivity : AppCompatActivity(),
 
     private var hasNextPage = true
     private var isLoading = false
+    private var currentPage = PAGE_START
     private var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener? = null
 
     private val adapter by lazy {
@@ -54,12 +55,10 @@ class RepositoryListActivity : AppCompatActivity(),
             if (it.containsKey(REPO_RESULT)) {
                 adapter.clear()
                 adapter.updateItems(savedInstanceState.getParcelableArrayList(REPO_RESULT))
-                viewModel.nextPage = PAGE_START
             }
 
         } ?: run {
-            viewModel.nextPage = PAGE_START
-            lifecycle.addObserver(viewModel)
+            viewModel.loadRepositories(currentPage)
         }
 
 
@@ -79,6 +78,7 @@ class RepositoryListActivity : AppCompatActivity(),
     override fun onDestroy() {
         super.onDestroy()
         endlessRecyclerViewScrollListener?.clear()
+        adapter.clear()
     }
 
     private fun setupObservers() {
@@ -154,14 +154,13 @@ class RepositoryListActivity : AppCompatActivity(),
         return dividerDecor
     }
 
-    override fun nextPage(): Int = viewModel.nextPage
+    override fun nextPage(): Int = currentPage++
 
     override fun hasNextPage(): Boolean = hasNextPage
 
     override fun isLoading(): Boolean = isLoading
 
     override fun loadMore(page: Int) {
-        viewModel.nextPage++
-        viewModel.loadRepositories()
+        viewModel.loadRepositories(page)
     }
 }
