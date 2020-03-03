@@ -2,10 +2,8 @@ package br.com.flyingdutchman.arena_challenge.presentation
 
 import androidx.lifecycle.*
 import br.com.flyingdutchman.arena_challenge.data.GithubRepository
-import br.com.flyingdutchman.arena_challenge.presentation.livedata.SingleLiveEvent
 import br.com.flyingdutchman.arena_challenge.ui.features.repositories.Repository
 import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 
 class RepositoyViewModel(
@@ -18,25 +16,27 @@ class RepositoyViewModel(
         MutableLiveData<ViewState<List<Repository>>>()
     }
 
+    var nextPage = 1
+
     private val compositeDisposable: CompositeDisposable by lazy {
         CompositeDisposable()
     }
 
-    fun loadRepositories(page: Int = 1) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun loadRepositories() {
         if (viewState.value == null) {
-            viewState.postValue(
+            viewState.value =
                 ViewState(
                     status = ViewState.Status.LOADING
                 )
-            )
         }
 
         repository
-            .searchRepos(page)
+            .searchRepos(nextPage)
             .observeOn(mainScheduler)
             .subscribe(
                 { result ->
-                    viewState.postValue(
+                    viewState.value =
                         ViewState(
                             status = ViewState.Status.SUCCESS,
                             data = result.map {
@@ -50,15 +50,15 @@ class RepositoyViewModel(
                                     it.starsCount
                                 )
                             })
-                    )
+
                 },
                 {
-                    viewState.postValue(
+                    viewState.value =
                         ViewState(
                             ViewState.Status.ERROR,
                             error = it
                         )
-                    )
+
                 })
             .apply {
                 compositeDisposable.add(this)

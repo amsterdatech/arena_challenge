@@ -2,21 +2,17 @@ package br.com.flyingdutchman.arena_challenge.ui.features.repositories
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import br.com.flyingdutchman.arena_challenge.*
-import br.com.flyingdutchman.arena_challenge.extensions.hide
-import br.com.flyingdutchman.arena_challenge.extensions.show
 import br.com.flyingdutchman.arena_challenge.extensions.snackBar
 import br.com.flyingdutchman.arena_challenge.presentation.RepositoyViewModel
 import br.com.flyingdutchman.arena_challenge.presentation.ViewState
 import br.com.flyingdutchman.arena_challenge.ui.EndlessRecyclerViewScrollListener
 import br.com.flyingdutchman.arena_challenge.ui.EndlessRecyclerViewScrollListener.Companion.PAGE_START
+import br.com.flyingdutchman.arena_challenge.ui.EndlessRecyclerViewScrollListener.Companion.PER_PAGE
 import br.com.flyingdutchman.arena_challenge.ui.features.issues.IssueListActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -26,7 +22,6 @@ class RepositoryListActivity : AppCompatActivity(),
 
     private var hasNextPage = true
     private var isLoading = false
-    private var nextPage = PAGE_START
     private var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener? = null
 
     private val adapter by lazy {
@@ -45,19 +40,44 @@ class RepositoryListActivity : AppCompatActivity(),
 
     private val viewModel: RepositoyViewModel by viewModel()
 
+    companion object {
+        const val REPO_RESULT = "REPO_RESULT"
+        const val REPO_PAGE = "REPO_PAGE"
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_main)
 
+        savedInstanceState?.let {
+            if (it.containsKey(REPO_RESULT)) {
+                adapter.clear()
+                adapter.updateItems(savedInstanceState.getParcelableArrayList(REPO_RESULT))
+            }
+
+            if (it.containsKey(REPO_PAGE)) {
+                viewModel.nextPage = savedInstanceState.getInt(REPO_PAGE)
+            }
+        } ?: run {
+            lifecycle.addObserver(viewModel)
+        }
+
 
         setupObservers()
         setupRecyclerView()
+    }
 
-        if (adapter.items.isEmpty()) {
-            viewModel.loadRepositories(nextPage)
-        }
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (adapter.items.isNotEmpty()) outState.putParcelableArrayList(
+            REPO_RESULT,
+            adapter.items.slice(0 until PER_PAGE) as ArrayList
+        )
+
+        outState.putInt(REPO_PAGE, viewModel.nextPage)
+
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
@@ -74,33 +94,28 @@ class RepositoryListActivity : AppCompatActivity(),
                 }
 
                 ViewState.Status.ERROR -> {
-                    if (isLoading) {
-                        isLoading = false
-                    }
                     activity_results_loading.hide()
                     activity_content_root
                         .snackBar(
-                            snackBarText = "Error",
+                            snackBarText = "Error ${(state.error as Throwable).message}",
                             listener = {
-                                viewModel.loadRepositories(nextPage)
+                                viewModel.loadRepositories()
                             }
                         )
                         .show()
+
+                    isLoading = false
                 }
 
                 ViewState.Status.SUCCESS -> {
-                    if (isLoading) {
-                        isLoading = false
-                    }
                     activity_results_loading.hide()
                     adapter.updateItems(state.data ?: emptyList())
-                    nextPage++
-
+                    viewModel.nextPage++
+                    isLoading = false
                 }
             }
         })
     }
-
 
     private fun setupRecyclerView() {
         val dividerDecor =
@@ -130,14 +145,13 @@ class RepositoryListActivity : AppCompatActivity(),
 
     }
 
-    override fun nextPage(): Int = nextPage
+    override fun nextPage(): Int = viewModel.nextPage
 
     override fun hasNextPage(): Boolean = hasNextPage
 
     override fun isLoading(): Boolean = isLoading
 
     override fun loadMore(page: Int) {
-        isLoading = true
-        viewModel.loadRepositories(page)
+        viewModel.loadRepositories()
     }
 }
