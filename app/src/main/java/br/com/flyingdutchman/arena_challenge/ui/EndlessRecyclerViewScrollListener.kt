@@ -8,7 +8,7 @@ class EndlessRecyclerViewScrollListener : RecyclerView.OnScrollListener {
 
     companion object {
         const val PAGE_START = 1
-        const val PER_PAGE = 10
+        const val PER_PAGE = 20
     }
 
     private var paginationCallback: PaginationCallback? = null
@@ -33,7 +33,6 @@ class EndlessRecyclerViewScrollListener : RecyclerView.OnScrollListener {
         ) {
             if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                 && firstVisibleItemPosition >= 0
-                && totalItemCount >= PER_PAGE
             ) {
                 paginationCallback?.loadMore()
             }
